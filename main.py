@@ -3,7 +3,7 @@ import argparse
 from utils import file_upload, get_model, get_audio_duration, format_time, write_output, transcribe
 
 def get_args():
-    parser = argparse.AugmentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument("HF_KEY", help="Your HuggingFace API KEY")
     parser.add_argument("--model_size", help="Adjust based on your computing power.", default="large-v3")
     parser.add_argument("--device", help="Use CPU or GPU. Can either be 'cuda' or 'cpu'", default="cuda")
