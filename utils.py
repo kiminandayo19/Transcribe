@@ -1,11 +1,12 @@
+import sys
 import subprocess, json
 from tqdm import tqdm
-from google.colab import files
 from faster_whisper import WhisperModel
 
 def file_upload():
-    uploaded = files.upload()
-    return list(uploaded.keys())[0] # Get only first item from uploaded
+    if len(sys.argv) < 2:
+        raise RuntimeError("Usage: python3 main.py <audio_file>")
+    return sys.argv[1]
 
 def get_model(config):
     return WhisperModel(
