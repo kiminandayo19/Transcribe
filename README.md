@@ -1,32 +1,73 @@
-## AUDIO TRANSCRIBING WITH PYTHON AND FASTER WHISPER
+# ⚡️ Whisper-to-SRT
+> **Blazing fast, GPU-accelerated audio transcription CLI tool.**
 
-#### Installation Setup
+Turn your audio files into subtitle files (`.srt`) in seconds using the power of [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper). 
 
-1.  Run `script.sh` to install ffmpeg
-    <details>
-        ```
-            chmod +x script.sh
-            ./script.sh
+Faster-Whisper is a reimplementation of OpenAI's Whisper model using CTranslate2, which is **up to 4x faster** than the original OpenAI implementation while using less memory.
 
-        ```
+## ✨ Features
 
-    </details>
+- 🚀 **Incredible Speed**: Leverages `faster-whisper` for optimized inference.
+- 🎯 **High Accuracy**: Supports all standard Whisper models (`large-v3`, `medium`, `base`, etc.).
+- 🎞️ **Direct to SRT**: Automatically generates formatted `.srt` files ready for video players or YouTube.
+- 📊 **Visual Feedback**: Real-time progress bar tracking transcription status.
+- 🌍 **Multi-language Support**: Auto-detection or force specific languages (e.g., English, Indonesian, Japanese).
+- 🔧 **Hardware Flexible**: Runs on NVIDIA GPUs (CUDA) or CPU.
 
-2.  Install all the requirements in `requirements.txt`
+## 🛠️ Installation
 
-#### Usage
+### 1. Prerequisites
+You need **FFmpeg** installed on your system to process audio files.
 
-Run the following command
-
+**Quick Install (Script included):**
+```bash
+chmod +x script.sh
+./script.sh
 ```
-python3 <path_to_audio_file> <your_hf_api_key>
+
+### 2. Install Dependencies
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
 ```
 
-###### Optional Args
+> **Note**: For GPU acceleration, ensure you have the appropriate NVIDIA drivers and CUDA toolkit installed for `torch` and `ctranslate2`.
 
-| Args         | Values                                                                                         | Default  | Description                                                         |
-| ------------ | ---------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
-| model_size   | tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large-v1, large-v2, large-v3 | large-v3 | Whisper model checkpoint. Larger = better accuracy, more VRAM.      |
-| device       | cuda, cpu                                                                                      | cuda     | Compute device. `cuda` requires NVIDIA GPU, `cpu` works everywhere. |
-| compute_type | float16, int8_float16, int8, float32                                                           | float16  | Numeric precision. Controls speed, memory usage, and accuracy.      |
-| lang         | ISO 639-1 codes (e.g. en, id, ja, zh, fr, de, es, ar, ru, pt) or auto-detect                   | id       | Target language. Omit or set to auto for detection.                 |
+## 🚀 Usage
+
+Basic usage is simple. Just pass your audio file. For standard models (like `large-v3`), you typically **do not** need an API key.
+
+```bash
+python3 main.py <path_to_audio_file>
+```
+
+### Example
+```bash
+python3 main.py podcast_episode.m4a --model_size medium --lang en
+```
+
+This will generate `podcast_episode.m4a.srt` in the same directory.
+
+## ⚙️ Configuration Options
+
+Customize reliability and performance with these flags:
+
+| Argument | Default | Description |
+| :--- | :--- | :--- |
+| `audio_path` | **Required** | Path to your input audio file (e.g., `.m4a`, `.mp3`, `.wav`). |
+| `--hf_key` | `None` | Your HuggingFace API Key (only needed for gated/private models). |
+| `--model_size` | `large-v3` | Balance speed vs. accuracy. Options: `tiny`, `base`, `small`, `medium`, `large-v3`. |
+| `--device` | `cuda` | Compute device. Use `cuda` for GPU (recommended) or `cpu`. |
+| `--compute_type` | `float16` | Precision type. `int8` is faster/smaller, `float16` is standard for GPUs. |
+| `--lang` | `id` | Target language ISO code (e.g., `en`, `id`, `ja`). Use `auto` for detection. |
+
+## 📦 Under the Hood
+
+This tool utilizes:
+- **[Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)**: For the heavy lifting of transcription.
+- **FFmpeg**: For extracting audio duration and metadata.
+- **tqdm**: For the beautiful progress bar.
+
+---
+*Built for speed and simplicity.*

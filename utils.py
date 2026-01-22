@@ -1,78 +1,57 @@
 import sys
-import subprocess, json
-from tqdm import tqdm
+import subprocess
+import json
+from typing import NamedTuple, Generator, List, Any
 from faster_whisper import WhisperModel
 
-def get_model(config):
+class TranscribeConfig(NamedTuple):
+    model_size: str
+    device: str
+    compute_type: str
+    lang: str
+
+def format_time(seconds: float) -> str:
+    """Converts seconds to SRT timestamp format (HH:MM:SS,mmm)."""
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = seconds % 60
+    return f"{h:02}:{m:02}:{s:06.3f}".replace(".", ",")
+
+def create_srt_block(index: int, start: float, end: float, text: str) -> str:
+    """Formats a single SRT block."""
+    return f"{index}\n{format_time(start)} --> {format_time(end)}\n{text.strip()}\n"
+
+def format_srt(segments) -> Generator[str, None, None]:
+    """Yields formatted SRT blocks from segments."""
+    for i, seg in enumerate(segments, start=1):
+        yield create_srt_block(i, seg.start, seg.end, seg.text)
+
+def get_model_instance(config: TranscribeConfig) -> WhisperModel:
+    """Initializes and returns the WhisperModel."""
     return WhisperModel(
         config.model_size,
         device=config.device,
         compute_type=config.compute_type
     )
 
-def get_audio_duration(audio):
+def get_audio_duration(audio_path: str) -> float:
+    """Gets audio duration using ffprobe."""
     cmd = [
         "ffprobe", "-v", "error",
         "-show_entries", "format=duration",
         "-of", "json",
-        audio
+        audio_path
     ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return float(json.loads(result.stdout)["format"]["duration"])
+    except (subprocess.CalledProcessError, json.JSONDecodeError, KeyError) as e:
+        sys.stderr.write(f"Error getting duration: {e}\n")
+        return 0.0
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    return float(json.loads(result.stdout)["format"]["duration"])
-
-def format_time(seconds):
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = seconds % 60
-    return f"{h:02}:{m:02}:{s:06.3f}".replace(".", ",")
-
-def write_output(audio, srt_lines):
-    outpath = audio + ".srt"
+def write_srt_file(audio_path: str, srt_content: List[str]) -> str:
+    """Writes the list of SRT blocks to a file."""
+    outpath = f"{audio_path}.srt"
     with open(outpath, "w", encoding="utf-8") as f:
-        f.write("\n".join(srt_lines))
-
-    print("Srt stored:", outpath)
-
-def transcribe(audio, audio_duration, args):
-    model = get_model(args)
-    
-    # Processing
-    segments, _ = model.transcribe(
-        audio,
-        beam_size=5,
-        vad_filter=True,
-        language=args.lang
-    )
-
-    progress_bar = tqdm(
-        total=audio_duration,
-        unit="sec",
-        desc="Transcribing to SRT"
-    )
-
-    srt_lines = list()
-    last_time = 0.0
-
-    for i, seg in enumerate(segments, start=1):
-        # Srt contents
-        srt_lines.append(str(i))
-        srt_lines.append(
-            f"{format_time(seg.start)} --> {format_time(seg.end)}"
-        )
-        srt_lines.append(seg.text.strip())
-        srt_lines.append("")
-
-        # Progress update
-        delta = max(seg.end - last_time, 0)
-        progress_bar.update(delta)
-        last_time = seg.end
-
-        progress_bar.set_postfix({
-            "at": f"{seg.end:.1f}s",
-            "text": seg.text[:25] + "..."
-        })
-
-    progress_bar.close()
-
-    return srt_lines
+        f.write("\n".join(srt_content))
+    return outpath
