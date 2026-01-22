@@ -3,11 +3,6 @@ import subprocess, json
 from tqdm import tqdm
 from faster_whisper import WhisperModel
 
-def file_upload():
-    if len(sys.argv) < 2:
-        raise RuntimeError("Usage: python3 main.py <audio_file>")
-    return sys.argv[1]
-
 def get_model(config):
     return WhisperModel(
         config["model_size"],
