@@ -1,13 +1,10 @@
 import os
 import argparse
-import subprocess, json
-from tqdm import tqdm
-from google.colab import files
-from faster_whisper import WhisperModel
 from utils import file_upload, get_model, get_audio_duration, format_time, write_output, transcribe
 
 def get_args():
     parser = argparse.AugmentParser()
+    parser.add_argument("HF_KEY", help="Your HuggingFace API KEY")
     parser.add_argument("--model_size", help="Adjust based on your computing power.", default="large-v3")
     parser.add_argument("--device", help="Use CPU or GPU. Can either be 'cuda' or 'cpu'", default="cuda")
     parser.add_argument("--compute_type", help="Float bytes you use", default="float16")
@@ -15,6 +12,7 @@ def get_args():
     return parser.parse_arg()
 
 def main(args):
+    os.environ["HF_API_TOKEN"] = args.HF_KEY
     audio = file_upload()
     audio_duration = get_audio_duration(audio)
 
