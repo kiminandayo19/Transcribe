@@ -5,9 +5,9 @@ from faster_whisper import WhisperModel
 
 def get_model(config):
     return WhisperModel(
-        config["model_size"],
-        device=config["device"],
-        compute_type=config["compute_type"]
+        config.model_size,
+        device=config.device,
+        compute_type=config.compute_type
     )
 
 def get_audio_duration(audio):
