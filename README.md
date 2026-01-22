@@ -1,5 +1,5 @@
 # ⚡️ Whisper-to-SRT
-> **Blazing fast, GPU-accelerated audio transcription CLI tool.**
+> Fast, GPU-accelerated audio transcription CLI tool built on Faster-Whisper.
 
 Turn your audio files into subtitle files (`.srt`) in seconds using the power of [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper). 
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ## 🚀 Usage
 
-Basic usage is simple. Just pass your audio file. For standard models (like `large-v3`), you typically **do not** need an API key.
+Basic usage is simple. Just pass your audio file. For standard open models (e.g. `large-v3`), no API key is required.
 
 ```bash
 python3 main.py <path_to_audio_file>
@@ -68,6 +68,12 @@ This tool utilizes:
 - **[Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)**: For the heavy lifting of transcription.
 - **FFmpeg**: For extracting audio duration and metadata.
 - **tqdm**: For the beautiful progress bar.
+
+## 🧠 Notes & Trade-offs
+
+- Long audio files are processed in segments internally by Faster-Whisper.
+- Transcription speed depends on model size, audio length, and hardware.
+- This tool focuses on simplicity and reproducibility rather than UI.
 
 ---
 *Built for speed and simplicity.*
