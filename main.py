@@ -20,8 +20,8 @@ def main(args):
     print("Running On:", args.device)
     print("Using Compute Type:", args.compute_type)
 
-    srt_lines = transcribe(audio_duration, args)
-    write_output(audio, srt_lines)
+    srt_lines = transcribe(args.audio_path, audio_duration, args)
+    write_output(args.audio_path, srt_lines)
 
 if __name__ == "__main__":
     args = get_args()

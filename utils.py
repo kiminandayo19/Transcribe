@@ -34,7 +34,7 @@ def write_output(audio, srt_lines):
 
     print("Srt stored:", outpath)
 
-def transcribe(audio_duration, args):
+def transcribe(audio, audio_duration, args):
     model = get_model(args)
     
     # Processing
