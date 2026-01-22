@@ -9,7 +9,7 @@ def get_args():
     parser.add_argument("--device", help="Use CPU or GPU. Can either be 'cuda' or 'cpu'", default="cuda")
     parser.add_argument("--compute_type", help="Float bytes you use", default="float16")
     parser.add_argument("--lang", help="Target language", default="id")
-    return parser.parse_arg()
+    return parser.parse_args()
 
 def main(args):
     os.environ["HF_API_TOKEN"] = args.HF_KEY
@@ -20,8 +20,6 @@ def main(args):
     print("Running On:", args.device)
     print("Using Compute Type:", args.compute_type)
 
-    model = get_model(args)
-    
     srt_lines = transcribe(audio_duration, args)
     write_output(audio, srt_lines)
 
